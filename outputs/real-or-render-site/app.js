@@ -6,11 +6,11 @@
   let seen = new Set();
   try { seen = new Set(JSON.parse(localStorage.getItem('ror-natural-seen-206-v3') || '[]')); } catch {}
   const TIME_LIMIT = 20000;
-  let deck = [], answers = [], round = 0, score = 0, loaded = false, best = 0, mode = 'chill';
+  let deck = [], answers = [], round = 0, score = 0, points = 0, loaded = false, best = null, mode = 'chill';
   let timer = null, deadline = 0, activeRound = -1, remaining = TIME_LIMIT, scopeOn = false, timedStarted = false;
   let imageZoom = 1, panX = 0, panY = 0, drag = null, lastScopePoint = null;
   try { mode = localStorage.getItem('ror-mode') === 'timed' ? 'timed' : 'chill'; } catch {}
-  function readBest() { try { best = Number(localStorage.getItem(mode === 'chill' ? 'ror-natural-best-v3' : 'ror-timed-best-v1')) || 0; } catch { best = 0; } }
+  function readBest() { try { const saved = localStorage.getItem(mode === 'chill' ? 'ror-natural-best-points-v1' : 'ror-timed-best-points-v1'); best = saved === null ? null : Number(saved); if (!Number.isFinite(best)) best = null; } catch { best = null; } }
   function stopTimer() { clearInterval(timer); timer = null; deadline = 0; activeRound = -1; }
   const escape = value => String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function generationRecord(card) {
@@ -42,9 +42,9 @@
   function start() {
     stopTimer(); readBest();
     deck = shuffle([...draw(true, ROUNDS / 2), ...draw(false, ROUNDS / 2)]);
-    round = 0; score = 0; answers = []; remaining = TIME_LIMIT; timedStarted = false;
+    round = 0; score = 0; points = 0; answers = []; remaining = TIME_LIMIT; timedStarted = false;
     $('result').hidden = true; document.querySelector('.game').hidden = false;
-    $('review-list').hidden = true; $('share-status').textContent = ''; $('score').textContent = '0';
+    $('review-list').hidden = true; $('share-status').textContent = ''; $('score').textContent = '0'; $('points').textContent = '0';
     $('mode-chill').setAttribute('aria-pressed', String(mode === 'chill'));
     $('mode-timed').setAttribute('aria-pressed', String(mode === 'timed'));
     $('mode-switch').setAttribute('data-mode', mode);
@@ -151,9 +151,12 @@
     if (answers[index]) return;
     if (index === activeRound) stopTimer();
     const card = deck[index], correct = ai !== null && card.ai === ai;
+    const pointChange = correct ? 100 : -25;
     if (correct) score++;
-    answers[index] = {card, correct, guess: ai}; $('score').textContent = String(score);
-    $('session-announcement').textContent = `Image ${index + 1}: ${correct ? 'correct' : ai === null ? 'time expired' : 'missed'}. ${score} correct so far.`;
+    points += pointChange;
+    answers[index] = {card, correct, guess: ai, pointChange};
+    $('score').textContent = String(score); $('points').textContent = String(points);
+    $('session-announcement').textContent = `Image ${index + 1}: ${correct ? 'correct' : ai === null ? 'time expired' : 'missed'}. ${pointChange > 0 ? 'Plus' : 'Minus'} ${Math.abs(pointChange)} eye points. ${score} correct so far.`;
     seen.add(card.id);
     try { localStorage.setItem('ror-natural-seen-206-v3', JSON.stringify([...seen])); } catch {}
     remaining = TIME_LIMIT;
@@ -162,12 +165,14 @@
     progress(); updateTimer();
   }
   function reveal() {
-    const {card, correct, guess: choice} = answers[round];
+    const {card, correct, guess: choice, pointChange} = answers[round];
     $('choices').hidden = true; $('reveal').hidden = false;
     $('real').disabled = $('ai').disabled = true;
     $('question').textContent = 'The reveal'; $('instruction').textContent = `${score} of ${answers.filter(Boolean).length} correct`;
     $('verdict').textContent = correct ? 'Good eye. You got it.' : choice === null ? 'Time’s up. Here’s the answer.' : 'This one fooled you.';
     $('verdict').className = correct ? 'correct-text' : 'wrong-text';
+    $('point-award').className = `point-award ${correct ? 'earned' : 'lost'}`;
+    $('point-award-value').textContent = `${pointChange > 0 ? '+' : '−'}${Math.abs(pointChange)}`;
     $('truth').textContent = card.ai ? 'AI-generated' : 'Real photograph';
     $('explanation').textContent = card.note;
     $('source-link').href = card.source;
@@ -179,16 +184,17 @@
   $('back').onclick = () => { if (round > 0) { round--; render(); } };
   function finish() {
     stopTimer();
-    best = Math.max(best, score); try { localStorage.setItem(mode === 'chill' ? 'ror-natural-best-v3' : 'ror-timed-best-v1', String(best)); } catch {}
+    best = best === null ? points : Math.max(best, points); try { localStorage.setItem(mode === 'chill' ? 'ror-natural-best-points-v1' : 'ror-timed-best-points-v1', String(best)); } catch {}
     document.querySelector('.game').hidden = true; $('result').hidden = false;
-    $('final-score').textContent = score; $('accuracy').textContent = Math.round(score / deck.length * 100) + '%'; $('best').textContent = `${best} / ${deck.length}`;
+    $('final-score').textContent = points; $('point-summary').textContent = `${score} correct · ${deck.length - score} missed · +100 for a correct answer, −25 otherwise`;
+    $('accuracy').textContent = Math.round(score / deck.length * 100) + '%'; $('best').textContent = `${best} pts`;
     $('result-title').textContent = score === deck.length ? 'Your eyes are on the prize.' : score >= 4 ? 'You have a sharp eye.' : score >= 2 ? 'Reality has competition.' : 'The pixels played you.';
     $('result-copy').textContent = 'Looks can be convincing. A creator’s record, original file, and trusted source tell you more than a visual clue alone.';
     $('result').focus({preventScroll:true}); $('result').scrollIntoView({behavior:'smooth',block:'center'});
   }
   $('again').onclick = () => { start(); document.querySelector('.game').scrollIntoView({behavior:'smooth',block:'start'}); };
   $('share').onclick = async () => {
-    const text = `I spotted ${score}/${deck.length} in Real or Render (${mode === 'timed' ? '20-second timed' : 'chill'} mode). Can you trust your eyes?`;
+    const text = `I scored ${points} eye points and spotted ${score}/${deck.length} in Real or Render (${mode === 'timed' ? '20-second timed' : 'chill'} mode). Can you trust your eyes?`;
     try {
       if (navigator.share && location.protocol !== 'file:') await navigator.share({title:'Real or Render',text,url:location.href});
       else if (navigator.clipboard && location.protocol !== 'file:') { await navigator.clipboard.writeText(text + '\n' + location.href); $('share-status').textContent = 'Score and link copied.'; }
@@ -197,7 +203,7 @@
   };
   $('review').onclick = () => {
     const list = $('review-list'); list.hidden = !list.hidden;
-    list.innerHTML = answers.map(({card, correct}) => `<article class="review-card"><img src="${escape(card.image)}" alt="${escape(card.alt)}"><div><strong>${correct ? '✓ Correct' : '↳ Missed'} · ${card.ai ? 'AI-generated' : 'Real photograph'}</strong><p>${escape(card.note)}</p>${sourceMarkup(card)}</div></article>`).join('');
+    list.innerHTML = answers.map(({card, correct, pointChange}) => `<article class="review-card"><img src="${escape(card.image)}" alt="${escape(card.alt)}"><div><strong>${correct ? '✓ Correct' : '↳ Missed'} · ${card.ai ? 'AI-generated' : 'Real photograph'} · ${pointChange > 0 ? '+' : '−'}${Math.abs(pointChange)} eye points</strong><p>${escape(card.note)}</p>${sourceMarkup(card)}</div></article>`).join('');
     bindRecords();
   };
   function showInfo(html) { $('dialog-content').innerHTML = html; $('info-dialog').showModal(); }
@@ -205,7 +211,7 @@
     const notices = window.UI_NOTICES;
     showInfo('<div class="eyebrow">BUILT WITH CARE</div><h2>A little design detail.</h2>' + (notices ? notices.sources.map(s => `<div class="credit-item"><a href="${escape(s.url)}" target="_blank" rel="noopener"><strong>${escape(s.name)} ↗</strong></a><p>${escape(s.use)}</p></div>`).join('') + `<details><summary>Watermelon component license</summary><pre class="license-copy">${escape(notices.watermelonLicense)}</pre></details><details><summary>Font licenses</summary><pre class="license-copy">${escape(notices.fontLicenses)}</pre></details>` : '<p>See COMPONENT-LICENSES.txt in the website folder.</p>'));
   };
-  $('how').onclick = () => showInfo(`<div class="eyebrow">A TEST OF PERCEPTION</div><h2>One image.<br>Two possibilities.</h2><ol><li><strong>Find your pace.</strong> Chill has no timer. Timed gives you 20 seconds per image, and waits until you press <strong>Start timed game</strong>. The first picture stays hidden until then. Switching modes starts a fresh game.</li><li><strong>Get closer.</strong> Click or tap the picture to open it. The zoom slider, − and + buttons enlarge the whole image from 100% to 400%. Drag the image, use the on-screen arrow buttons, or press arrow keys in the image area to pan. <strong>Fit</strong> resets the view. Switch <strong>Scope on</strong> for an additional magnifying lens.</li><li><strong>Trust your instinct.</strong> Pick Real photo or AI-generated, or press <strong>1</strong> or <strong>2</strong>. A correct answer earns a little firework.</li><li><strong>Meet the truth.</strong> Read the reveal and its source. Next continues; Back reviews earlier answers, which stay locked.</li></ol><p>In Timed mode, after you start, the countdown keeps running during close inspection, help, and Back review. An expired timer counts as a missed answer. The next image’s clock starts after you press Next and its image loads. Escape or × closes a dialog.</p><p>Each game draws three AI images and three camera photos from the ${cards.length}-card collection. Replay prioritizes images you have not answered yet.</p><p><strong>What counts as real?</strong> A camera-origin photograph, including conventional edits or panoramas. AI means the image was generated by a model. Answers follow the linked source records; this game is not an AI detector.</p><p>Best scores are saved separately for each mode. Played-card history stays in this browser.</p>`);
+  $('how').onclick = () => showInfo(`<div class="eyebrow">A TEST OF PERCEPTION</div><h2>One image.<br>Two possibilities.</h2><ol><li><strong>Find your pace.</strong> Chill has no timer. Timed gives you 20 seconds per image, and waits until you press <strong>Start timed game</strong>. The first picture stays hidden until then. Switching modes starts a fresh game.</li><li><strong>Get closer.</strong> Click or tap the picture to open it. The zoom slider, − and + buttons enlarge the whole image from 100% to 400%. Drag the image, use the on-screen arrow buttons, or press arrow keys in the image area to pan. <strong>Fit</strong> resets the view. Switch <strong>Scope on</strong> for an additional magnifying lens.</li><li><strong>Trust your instinct.</strong> Pick Real photo or AI-generated, or press <strong>1</strong> or <strong>2</strong>. A correct answer earns <strong>100 eye points</strong>; an incorrect answer or timeout loses <strong>25</strong>. Your running total and each round’s point change are shown as you play.</li><li><strong>Meet the truth.</strong> Read the reveal and its source. Next continues; Back reviews earlier answers, which stay locked.</li></ol><p>In Timed mode, after you start, the countdown keeps running during close inspection, help, and Back review. An expired timer counts as a missed answer. The next image’s clock starts after you press Next and its image loads. Escape or × closes a dialog.</p><p>Each game draws three AI images and three camera photos from the ${cards.length}-card collection. Replay prioritizes images you have not answered yet.</p><p><strong>What counts as real?</strong> A camera-origin photograph, including conventional edits or panoramas. AI means the image was generated by a model. Answers follow the linked source records; this game is not an AI detector.</p><p>Best eye-point totals are saved separately for each mode. Played-card history stays in this browser.</p>`);
   $('credits').onclick = () => {
     showInfo(`<h2>Behind the images</h2><p>${cards.length} cards: ${cards.filter(c => c.ai).length} AI images and ${cards.filter(c => !c.ai).length} camera photos. Answers are revealed here, so finish your game first if you want the full challenge. Round images are cropped to fill the frame; zoom shows the full image. Some images were resized and recompressed for the game. No generative changes were made to camera photographs.</p>` + cards.map(c => `<div class="credit-item"><strong>${escape(c.title)}</strong>${escape(c.author)} · ${c.ai ? 'AI-generated' : 'Camera photograph'}<br>${sourceMarkup(c)} · ${c.licenseUrl ? `<a href="${escape(c.licenseUrl)}" target="_blank" rel="noopener">${escape(c.license)}</a>` : escape(c.license)}</div>`).join('') + (window.PHOTO_LICENSES ? `<details><summary>Collection license notices</summary><pre style="white-space:pre-wrap;font:10px/1.7 monospace">${escape(window.PHOTO_LICENSES)}</pre></details>` : ''));
     bindRecords();
