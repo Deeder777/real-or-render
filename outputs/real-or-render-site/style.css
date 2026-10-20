@@ -21,5 +21,8 @@ dialog{color:var(--ink);background:var(--surface);border:1px solid #ffffff80;bor
 @keyframes point-arrive{from{opacity:0;transform:translateY(5px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:480px){.title-star{width:27px;height:27px;right:-30px;bottom:1px;font-size:14px}.scoreboard{gap:5px}.score-pill{gap:4px;padding:4px 6px;font-size:10px}.score-pill>span:last-child{font-size:9px}.score-pill .icon{width:13px;height:13px}.point-award{margin-top:12px;padding:6px 9px}.point-summary{font-size:11px!important}}
 @media(prefers-reduced-motion:reduce){.point-award{animation:none}}
+.language-select{min-height:40px;padding:0 28px 0 10px;border:1px solid #ddd6e4;border-radius:9px;background:#ffffffbd;color:#49404f;font-size:11px;font-weight:700;cursor:pointer;box-shadow:0 2px 5px #30213d08}.language-select:focus-visible{outline:3px solid #8c80ff;outline-offset:3px}.header-right{gap:18px}
+@media(max-width:800px){.header-right{gap:10px}.language-select{min-height:38px;padding-inline:8px}}
+@media(max-width:480px){.header{padding-inline:12px}.header-right{gap:6px}.brand{font-size:16px;letter-spacing:-.7px}.brand-mark{width:28px;height:28px;margin-right:3px}.brand-dot{font-size:24px}.language-select{min-height:36px;padding:0 5px;font-size:10px}.help-button{min-height:36px;padding:0 7px;font-size:10px;gap:4px}.help-button .icon{width:14px;height:14px}.title-star{width:20px;height:20px;right:-10px;bottom:-5px}.title-star .icon{width:13px;height:13px}}
 
 

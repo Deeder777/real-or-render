@@ -1,7 +1,9 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
+  const t = (key, values) => window.ROR_I18N.t(key, values);
   const cards = window.PHOTO_CARDS || [];
+  const localize = (id, key, values = {}) => { const element = $(id); element.dataset.i18nValue = key; element.dataset.i18nValues = JSON.stringify(values); element.textContent = t(key, values); };
   const ROUNDS = 6;
   let seen = new Set();
   try { seen = new Set(JSON.parse(localStorage.getItem('ror-natural-seen-206-v3') || '[]')); } catch {}
@@ -14,10 +16,10 @@
   function stopTimer() { clearInterval(timer); timer = null; deadline = 0; activeRound = -1; }
   const escape = value => String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function generationRecord(card) {
-    showInfo(`<div class="eyebrow">GENERATION RECORD</div><h2>${escape(card.title)}</h2><p>This image was generated specifically for this game using OpenAI’s built-in image-generation tool. It is not a camera photograph.</p><p><strong>Created:</strong> 19 October 2026</p><p><strong>Prompt used:</strong></p><p>${escape(card.prompt)}</p>`);
+    showInfo(`<div class="eyebrow">${t('generationEyebrow')}</div><h2>${escape(card.title)}</h2><p>${t('generationCopy')}</p><p><strong>${t('created')}</strong> 19 October 2026</p><p><strong>${t('prompt')}</strong></p><p>${escape(card.prompt)}</p>`);
   }
   function sourceMarkup(card) {
-    return card.generated ? `<button class="text-button" data-source-id="${escape(card.id)}">Generation record ↗</button>` : `<a href="${escape(card.source)}" target="_blank" rel="noopener">Source & credits ↗</a>`;
+    return card.generated ? `<button class="text-button" data-source-id="${escape(card.id)}">${t('generation')}</button>` : `<a href="${escape(card.source)}" target="_blank" rel="noopener">${t('source')}</a>`;
   }
   function bindRecords() {
     document.querySelectorAll('[data-source-id]').forEach(button => {
@@ -48,9 +50,9 @@
     $('mode-chill').setAttribute('aria-pressed', String(mode === 'chill'));
     $('mode-timed').setAttribute('aria-pressed', String(mode === 'timed'));
     $('mode-switch').setAttribute('data-mode', mode);
-    $('session-announcement').textContent = '';
-    $('mode-note').textContent = mode === 'chill' ? 'Your pace. Your powers of observation.' : '20 seconds each. Press Start when you’re ready.';
-    $('deck-caption').textContent = `${cards.length} CARDS · 6 PER GAME · ${mode === 'chill' ? 'CHILL MODE' : 'TIMED MODE'}`;
+    $('session-announcement').textContent = ''; delete $('session-announcement').dataset.i18nValue; delete $('session-announcement').dataset.i18nValues;
+    localize('mode-note', mode === 'chill' ? 'modeNoteChill' : 'modeNoteTimed');
+    localize('deck-caption', 'deck', {count:cards.length,mode:mode === 'chill' ? t('deckChill') : t('deckTimed')});
     $('timer-strip').hidden = mode !== 'timed';
     $('celebration').replaceChildren();
     render(); updateTimer();
@@ -68,22 +70,35 @@
     mode = value; try { localStorage.setItem('ror-mode', mode); } catch {}
     start();
   }
+  document.addEventListener('ror-language-change', () => {
+    if (!document.querySelector('.game')) return;
+    localize('mode-note', mode === 'chill' ? 'modeNoteChill' : 'modeNoteTimed');
+    localize('deck-caption', 'deck', {count:cards.length,mode:mode === 'chill' ? t('deckChill') : t('deckTimed')});
+    if ($('zoom-dialog').open) {
+      $('inspect-mode-note').textContent = mode === 'timed' ? t('countdownContinues') : t('takeTime');
+      $('scope-help').textContent = t(scopeOn ? 'scopeHelpLens' : imageZoom > 1 ? 'scopeHelpPan' : 'scopeHelpZoom');
+    }
+    if (!$('result').hidden) updateResult();
+    else if (deck.length) render();
+  });
   function progress() {
     $('progress').innerHTML = deck.map((_, i) => `<span class="${answers[i] ? (answers[i].correct ? 'correct' : 'wrong') : i === round ? 'current' : ''}"></span>`).join('');
-    $('progress').setAttribute('aria-label', `${answers.filter(Boolean).length} of ${deck.length} images answered`);
+    const progressValues = {done:answers.filter(Boolean).length,total:deck.length};
+    $('progress').dataset.i18nAria = 'progress'; $('progress').dataset.i18nAriaValues = JSON.stringify(progressValues);
+    $('progress').setAttribute('aria-label', t('progress', progressValues));
     $('back').disabled = round === 0;
     $('next').disabled = !answers[round];
-    $('next').textContent = round === deck.length - 1 ? 'See your score ↗' : 'Next image →';
-    $('nav-hint').textContent = mode === 'timed' && !timedStarted ? 'Press Start to begin' : answers[round] ? `Image ${round + 1} of ${deck.length}` : 'Choose an answer to continue';
+    $('next').textContent = round === deck.length - 1 ? t('final') : t('next');
+    localize('nav-hint', mode === 'timed' && !timedStarted ? 'pressStart' : answers[round] ? 'progress' : 'chooseAnswer', answers[round] ? {done:round + 1,total:deck.length} : {});
   }
   function render() {
-    if (!deck.length) { $('question').textContent = 'Images are unavailable. Please reload.'; return; }
+    if (!deck.length) { $('question').textContent = t('unavailable'); return; }
     loaded = false;
     $('choices').hidden = !!answers[round]; $('reveal').hidden = !answers[round];
     $('real').disabled = $('ai').disabled = true;
-    $('question').textContent = 'What’s your instinct?'; $('instruction').textContent = 'Look. Think. Choose.';
-    $('round-label').textContent = `IMAGE ${String(round + 1).padStart(2, '0')} / ${String(deck.length).padStart(2, '0')}`;
-    $('image-index').textContent = `EXHIBIT ${String(round + 1).padStart(3, '0')}`;
+    localize('question', 'question'); localize('instruction', 'instruction');
+    localize('round-label', 'roundLabel', {round:String(round + 1).padStart(2, '0'),total:String(deck.length).padStart(2, '0')});
+    localize('image-index', 'exhibitLabel', {number:String(round + 1).padStart(3, '0')});
     $('image-error').hidden = true; $('photo-frame').classList.add('loading');
     // The alt text describes the scene without exposing its answer.
     $('photo').alt = deck[round].alt;
@@ -109,18 +124,18 @@
     $('photo').setAttribute('tabindex', waiting ? '-1' : '0');
     $('photo').setAttribute('aria-hidden', String(waiting));
     $('start-timed').disabled = !loaded;
-    $('start-timed').textContent = loaded ? 'Start timed game →' : 'Preparing image…';
+    $('start-timed').textContent = loaded ? t('startTimed') : t('preparing');
     if (waiting) {
-      $('question').textContent = 'A little focus goes a long way.';
-      $('instruction').textContent = 'Your clock is waiting.';
-      $('nav-hint').textContent = 'Press Start to begin';
+      localize('question', 'focusTitle');
+      localize('instruction', 'clockWaiting');
+      localize('nav-hint', 'pressStart');
     }
   }
   $('start-timed').onclick = () => {
     if (mode !== 'timed' || timedStarted || !loaded) return;
     timedStarted = true; updateReady();
     $('real').disabled = $('ai').disabled = false;
-    $('question').textContent = 'What’s your instinct?'; $('instruction').textContent = 'Look. Think. Choose.';
+    localize('question', 'question'); localize('instruction', 'instruction');
     progress(); beginTimer(); $('real').focus({preventScroll:true});
   };
   function beginTimer() {
@@ -131,14 +146,16 @@
   function updateTimer() {
     const left = deadline ? Math.max(0, deadline - Date.now()) : remaining;
     const currentAnswered = !!answers[round];
-    $('timer-label').textContent = mode === 'timed' && !timedStarted ? 'Ready when you are · 20s per image' : deadline ? `${Math.ceil(left / 1000)}s remaining${activeRound !== round ? ` · image ${activeRound + 1}` : ''}` : currentAnswered ? 'Answer locked in' : `${Math.ceil(left / 1000)}s · waiting for image`;
-    if (mode === 'timed') $('inspect-mode-note').textContent = deadline ? `${Math.ceil(left / 1000)}s remaining · the clock keeps running.` : currentAnswered ? 'Answer locked in. Close to see the reveal.' : '20 seconds per image.';
+    const timerKey = mode === 'timed' && !timedStarted ? 'readyTimer' : deadline ? 'timeRemaining' : currentAnswered ? 'answerLocked' : 'waitingImage';
+    localize('timer-label', timerKey, {seconds:Math.ceil(left / 1000)});
+    if (mode === 'timed') $('inspect-mode-note').textContent = deadline ? t('clockContinues', {seconds:Math.ceil(left / 1000)}) : currentAnswered ? t('closeReveal') : t('twentySeconds');
     $('timer-fill').style.width = `${left / TIME_LIMIT * 100}%`;
     $('timer-strip').classList.toggle('urgent', !!deadline && left <= 5000);
     const answer = answers[round], waiting = mode === 'timed' && !timedStarted;
     $('round-status').setAttribute('data-state', waiting ? 'ready' : answer ? (answer.correct ? 'correct' : 'missed') : 'playing');
     $('status-symbol').textContent = waiting ? '◷' : answer ? (answer.correct ? '✓' : '↳') : '◉';
-    $('status-caption').textContent = waiting ? 'Ready when you are' : answer ? (answer.correct ? 'Good eye · correct' : answer.guess === null ? 'Time’s up · revealed' : 'Answer revealed') : deadline ? `${Math.ceil(left / 1000)}s left${activeRound !== round ? ` · image ${activeRound + 1}` : ''}` : mode === 'timed' ? '20s · loading' : 'Chill · no rush';
+    const statusKey = waiting ? 'readyStatus' : answer ? (answer.correct ? 'correctStatus' : answer.guess === null ? 'timeoutStatus' : 'missedStatus') : deadline ? 'secondsLeft' : mode === 'timed' ? 'timedLoading' : 'chillStatus';
+    localize('status-caption', statusKey, {seconds:Math.ceil(left / 1000),image:activeRound + 1});
     if (deadline && left <= 0) recordAnswer(activeRound, null);
   }
   function guess(ai) {
@@ -156,7 +173,7 @@
     points += pointChange;
     answers[index] = {card, correct, guess: ai, pointChange};
     $('score').textContent = String(score); $('points').textContent = String(points);
-    $('session-announcement').textContent = `Image ${index + 1}: ${correct ? 'correct' : ai === null ? 'time expired' : 'missed'}. ${pointChange > 0 ? 'Plus' : 'Minus'} ${Math.abs(pointChange)} eye points. ${score} correct so far.`;
+    localize('session-announcement', 'answerAnnouncement', {image:index + 1,result:`$${correct ? 'correctAnnouncement' : ai === null ? 'expiredAnnouncement' : 'missedAnnouncement'}`,change:`$${pointChange > 0 ? 'plus' : 'minus'}`,points:Math.abs(pointChange),correct:score});
     seen.add(card.id);
     try { localStorage.setItem('ror-natural-seen-206-v3', JSON.stringify([...seen])); } catch {}
     remaining = TIME_LIMIT;
@@ -168,15 +185,15 @@
     const {card, correct, guess: choice, pointChange} = answers[round];
     $('choices').hidden = true; $('reveal').hidden = false;
     $('real').disabled = $('ai').disabled = true;
-    $('question').textContent = 'The reveal'; $('instruction').textContent = `${score} of ${answers.filter(Boolean).length} correct`;
-    $('verdict').textContent = correct ? 'Good eye. You got it.' : choice === null ? 'Time’s up. Here’s the answer.' : 'This one fooled you.';
+    localize('question', 'reveal'); localize('instruction', 'correctCount', {correct:score,total:answers.filter(Boolean).length});
+    $('verdict').textContent = correct ? t('gotIt') : choice === null ? t('timedOut') : t('fooled');
     $('verdict').className = correct ? 'correct-text' : 'wrong-text';
     $('point-award').className = `point-award ${correct ? 'earned' : 'lost'}`;
     $('point-award-value').textContent = `${pointChange > 0 ? '+' : '−'}${Math.abs(pointChange)}`;
-    $('truth').textContent = card.ai ? 'AI-generated' : 'Real photograph';
+    $('truth').textContent = card.ai ? t('aiAnswer') : t('realAnswer');
     $('explanation').textContent = card.note;
     $('source-link').href = card.source;
-    $('source-link').textContent = card.generated ? 'View generation record ↗' : 'View source & credits ↗';
+    $('source-link').textContent = card.generated ? t('generation') : t('source');
     $('source-link').onclick = event => { if (card.generated) { event.preventDefault(); generationRecord(card); } };
   }
   $('real').onclick = () => guess(false); $('ai').onclick = () => guess(true);
@@ -186,34 +203,38 @@
     stopTimer();
     best = best === null ? points : Math.max(best, points); try { localStorage.setItem(mode === 'chill' ? 'ror-natural-best-points-v1' : 'ror-timed-best-points-v1', String(best)); } catch {}
     document.querySelector('.game').hidden = true; $('result').hidden = false;
-    $('final-score').textContent = points; $('point-summary').textContent = `${score} correct · ${deck.length - score} missed · +100 for a correct answer, −25 otherwise`;
-    $('accuracy').textContent = Math.round(score / deck.length * 100) + '%'; $('best').textContent = `${best} pts`;
-    $('result-title').textContent = score === deck.length ? 'Your eyes are on the prize.' : score >= 4 ? 'You have a sharp eye.' : score >= 2 ? 'Reality has competition.' : 'The pixels played you.';
-    $('result-copy').textContent = 'Looks can be convincing. A creator’s record, original file, and trusted source tell you more than a visual clue alone.';
+    updateResult();
     $('result').focus({preventScroll:true}); $('result').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function updateResult() {
+    $('final-score').textContent = points;
+    $('point-summary').textContent = t('resultSummary', {correct:score,missed:deck.length - score});
+    $('accuracy').textContent = Math.round(score / deck.length * 100) + '%'; $('best').textContent = `${best ?? 0} ${t('pointsShort')}`;
+    $('result-title').textContent = score === deck.length ? t('resultPerfect') : score >= 4 ? t('resultSharp') : score >= 2 ? t('resultCompetition') : t('resultPixels');
+    $('result-copy').textContent = t('resultCopy');
   }
   $('again').onclick = () => { start(); document.querySelector('.game').scrollIntoView({behavior:'smooth',block:'start'}); };
   $('share').onclick = async () => {
-    const text = `I scored ${points} eye points and spotted ${score}/${deck.length} in Real or Render (${mode === 'timed' ? '20-second timed' : 'chill'} mode). Can you trust your eyes?`;
+    const text = t('shareText', {points,score,total:deck.length,mode:mode === 'timed' ? t('timed') : t('chill')});
     try {
       if (navigator.share && location.protocol !== 'file:') await navigator.share({title:'Real or Render',text,url:location.href});
-      else if (navigator.clipboard && location.protocol !== 'file:') { await navigator.clipboard.writeText(text + '\n' + location.href); $('share-status').textContent = 'Score and link copied.'; }
+      else if (navigator.clipboard && location.protocol !== 'file:') { await navigator.clipboard.writeText(text + '\n' + location.href); $('share-status').textContent = t('scoreCopied'); }
       else $('share-status').textContent = text;
     } catch (e) { if (e.name !== 'AbortError') $('share-status').textContent = text; }
   };
   $('review').onclick = () => {
     const list = $('review-list'); list.hidden = !list.hidden;
-    list.innerHTML = answers.map(({card, correct, pointChange}) => `<article class="review-card"><img src="${escape(card.image)}" alt="${escape(card.alt)}"><div><strong>${correct ? '✓ Correct' : '↳ Missed'} · ${card.ai ? 'AI-generated' : 'Real photograph'} · ${pointChange > 0 ? '+' : '−'}${Math.abs(pointChange)} eye points</strong><p>${escape(card.note)}</p>${sourceMarkup(card)}</div></article>`).join('');
+    list.innerHTML = answers.map(({card, correct, pointChange}) => `<article class="review-card"><img src="${escape(card.image)}" alt="${escape(card.alt)}"><div><strong>${correct ? `✓ ${t('correctAnnouncement')}` : `↳ ${t('missedAnnouncement')}`} · ${card.ai ? t('aiAnswer') : t('realAnswer')} · ${pointChange > 0 ? '+' : '−'}${Math.abs(pointChange)} ${t('eyePoints')}</strong><p>${escape(card.note)}</p>${sourceMarkup(card)}</div></article>`).join('');
     bindRecords();
   };
   function showInfo(html) { $('dialog-content').innerHTML = html; $('info-dialog').showModal(); }
   $('design-credits').onclick = () => {
     const notices = window.UI_NOTICES;
-    showInfo('<div class="eyebrow">BUILT WITH CARE</div><h2>A little design detail.</h2>' + (notices ? notices.sources.map(s => `<div class="credit-item"><a href="${escape(s.url)}" target="_blank" rel="noopener"><strong>${escape(s.name)} ↗</strong></a><p>${escape(s.use)}</p></div>`).join('') + `<details><summary>Watermelon component license</summary><pre class="license-copy">${escape(notices.watermelonLicense)}</pre></details><details><summary>Font licenses</summary><pre class="license-copy">${escape(notices.fontLicenses)}</pre></details>` : '<p>See COMPONENT-LICENSES.txt in the website folder.</p>'));
+    showInfo(`<div class="eyebrow">${t('designEyebrow')}</div><h2>${t('designTitle')}</h2>` + (notices ? notices.sources.map(s => `<div class="credit-item"><a href="${escape(s.url)}" target="_blank" rel="noopener"><strong>${escape(s.name)} ↗</strong></a><p>${escape(s.use)}</p></div>`).join('') + `<details><summary>${t('licenseWatermelon')}</summary><pre class="license-copy">${escape(notices.watermelonLicense)}</pre></details><details><summary>${t('licenseFonts')}</summary><pre class="license-copy">${escape(notices.fontLicenses)}</pre></details>` : `<p>${t('designFallback')}</p>`));
   };
-  $('how').onclick = () => showInfo(`<div class="eyebrow">A TEST OF PERCEPTION</div><h2>One image.<br>Two possibilities.</h2><ol><li><strong>Find your pace.</strong> Chill has no timer. Timed gives you 20 seconds per image, and waits until you press <strong>Start timed game</strong>. The first picture stays hidden until then. Switching modes starts a fresh game.</li><li><strong>Get closer.</strong> Click or tap the picture to open it. The zoom slider, − and + buttons enlarge the whole image from 100% to 400%. Drag the image, use the on-screen arrow buttons, or press arrow keys in the image area to pan. <strong>Fit</strong> resets the view. Switch <strong>Scope on</strong> for an additional magnifying lens.</li><li><strong>Trust your instinct.</strong> Pick Real photo or AI-generated, or press <strong>1</strong> or <strong>2</strong>. A correct answer earns <strong>100 eye points</strong>; an incorrect answer or timeout loses <strong>25</strong>. Your running total and each round’s point change are shown as you play.</li><li><strong>Meet the truth.</strong> Read the reveal and its source. Next continues; Back reviews earlier answers, which stay locked.</li></ol><p>In Timed mode, after you start, the countdown keeps running during close inspection, help, and Back review. An expired timer counts as a missed answer. The next image’s clock starts after you press Next and its image loads. Escape or × closes a dialog.</p><p>Each game draws three AI images and three camera photos from the ${cards.length}-card collection. Replay prioritizes images you have not answered yet.</p><p><strong>What counts as real?</strong> A camera-origin photograph, including conventional edits or panoramas. AI means the image was generated by a model. Answers follow the linked source records; this game is not an AI detector.</p><p>Best eye-point totals are saved separately for each mode. Played-card history stays in this browser.</p>`);
+  $('how').onclick = () => showInfo(`<div class="eyebrow">${t('helpEyebrow')}</div><h2>${t('helpTitle')}</h2><ol><li>${t('helpPace')}</li><li>${t('helpCloser')}</li><li>${t('helpPoints')}</li><li>${t('helpReveal')}</li></ol><p>${t('helpTimer')}</p><p>${t('helpDeck', {count:cards.length})}</p><p>${t('helpDefinition')}</p><p>${t('helpStorage')}</p>`);
   $('credits').onclick = () => {
-    showInfo(`<h2>Behind the images</h2><p>${cards.length} cards: ${cards.filter(c => c.ai).length} AI images and ${cards.filter(c => !c.ai).length} camera photos. Answers are revealed here, so finish your game first if you want the full challenge. Round images are cropped to fill the frame; zoom shows the full image. Some images were resized and recompressed for the game. No generative changes were made to camera photographs.</p>` + cards.map(c => `<div class="credit-item"><strong>${escape(c.title)}</strong>${escape(c.author)} · ${c.ai ? 'AI-generated' : 'Camera photograph'}<br>${sourceMarkup(c)} · ${c.licenseUrl ? `<a href="${escape(c.licenseUrl)}" target="_blank" rel="noopener">${escape(c.license)}</a>` : escape(c.license)}</div>`).join('') + (window.PHOTO_LICENSES ? `<details><summary>Collection license notices</summary><pre style="white-space:pre-wrap;font:10px/1.7 monospace">${escape(window.PHOTO_LICENSES)}</pre></details>` : ''));
+    showInfo(`<h2>${t('imageCreditsTitle')}</h2><p>${t('imageCount', {count:cards.length,ai:cards.filter(c => c.ai).length,real:cards.filter(c => !c.ai).length})}</p>` + cards.map(c => `<div class="credit-item"><strong>${escape(c.title)}</strong>${escape(c.author)} · ${c.ai ? t('aiAnswer') : t('realAnswer')}<br>${sourceMarkup(c)} · ${c.licenseUrl ? `<a href="${escape(c.licenseUrl)}" target="_blank" rel="noopener">${escape(c.license)}</a>` : escape(c.license)}</div>`).join('') + (window.PHOTO_LICENSES ? `<details><summary>${t('licenseNotices')}</summary><pre style="white-space:pre-wrap;font:10px/1.7 monospace">${escape(window.PHOTO_LICENSES)}</pre></details>` : ''));
     bindRecords();
   };
   function inspect() {
@@ -222,9 +243,9 @@
     $('zoom-photo').src = deck[round].image; $('zoom-photo').alt = deck[round].alt;
     $('scope-lens').style.backgroundImage = `url("${deck[round].image}")`;
     $('scope-lens').hidden = true;
-    $('scope-toggle').setAttribute('aria-pressed', 'false'); $('scope-toggle').textContent = 'Scope off';
+    $('scope-toggle').setAttribute('aria-pressed', 'false'); $('scope-toggle').textContent = t('scopeOff');
     $('inspect-stage').classList.remove('scope-enabled', 'is-dragging');
-    $('inspect-mode-note').textContent = mode === 'timed' ? 'The countdown keeps running.' : 'Take your time. Details tell a story.';
+    $('inspect-mode-note').textContent = mode === 'timed' ? t('countdownContinues') : t('takeTime');
     $('zoom-dialog').showModal();
     applyZoom(); updateTimer();
   }
@@ -232,10 +253,10 @@
   $('photo').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inspect(); } });
   $('scope-toggle').onclick = () => {
     scopeOn = !scopeOn; $('scope-toggle').setAttribute('aria-pressed', String(scopeOn));
-    $('scope-toggle').textContent = scopeOn ? 'Scope on' : 'Scope off';
+    $('scope-toggle').textContent = t(scopeOn ? 'scopeOn' : 'scopeOff');
     $('scope-lens').hidden = true;
     $('inspect-stage').classList.toggle('scope-enabled', scopeOn);
-    $('scope-help').textContent = scopeOn ? 'Move over the image for the lens. Zoom in and drag to pan.' : imageZoom > 1 ? 'Drag or use the arrow buttons to explore. Fit resets the view.' : 'Zoom in, then drag the picture to explore.';
+    $('scope-help').textContent = t(scopeOn ? 'scopeHelpLens' : imageZoom > 1 ? 'scopeHelpPan' : 'scopeHelpZoom');
     if (scopeOn) {
       const r = $('inspect-stage').getBoundingClientRect();
       moveScope({clientX:r.left + r.width / 2,clientY:r.top + r.height / 2});
@@ -254,14 +275,14 @@
     $('zoom-photo').style.transform = `translate(${panX}px, ${panY}px) scale(${imageZoom})`;
     $('scope-power').value = String(imageZoom);
     $('scope-power').style.setProperty('--range', `${(imageZoom - 1) / 3 * 100}%`);
-    $('scope-power').setAttribute('aria-valuetext', `${Math.round(imageZoom * 100)} percent`);
+    $('scope-power').setAttribute('aria-valuetext', t('scope100', {percent:Math.round(imageZoom * 100)}));
     $('scope-value').textContent = `${Math.round(imageZoom * 100)}%`;
     $('zoom-out').disabled = imageZoom <= 1; $('zoom-in').disabled = imageZoom >= 4;
     $('inspect-stage').classList.toggle('is-zoomed', imageZoom > 1);
     $('pan-controls').hidden = imageZoom <= 1;
     $('pan-left').disabled = panX >= maxX; $('pan-right').disabled = panX <= -maxX;
     $('pan-up').disabled = panY >= maxY; $('pan-down').disabled = panY <= -maxY;
-    $('scope-help').textContent = scopeOn ? 'Move over the image for the lens. Zoom in and drag to pan.' : imageZoom > 1 ? 'Drag or use the arrow buttons to explore. Fit resets the view.' : 'Zoom in, then drag the picture to explore.';
+    $('scope-help').textContent = t(scopeOn ? 'scopeHelpLens' : imageZoom > 1 ? 'scopeHelpPan' : 'scopeHelpZoom');
     if (scopeOn && lastScopePoint) moveScope(lastScopePoint);
   }
   function setZoom(value) {
