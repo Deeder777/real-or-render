@@ -16,7 +16,9 @@
   function stopTimer() { clearInterval(timer); timer = null; deadline = 0; activeRound = -1; }
   const escape = value => String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   function generationRecord(card) {
-    showInfo(`<div class="eyebrow">${t('generationEyebrow')}</div><h2>${escape(card.title)}</h2><p>${t('generationCopy')}</p><p><strong>${t('created')}</strong> 19 October 2026</p><p><strong>${t('prompt')}</strong></p><p>${escape(card.prompt)}</p>`);
+    const locale = {en: 'en-GB', ru: 'ru-RU', uz: 'uz-Latn-UZ'}[window.ROR_I18N.language] || 'en-GB';
+    const created = new Intl.DateTimeFormat(locale, {day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}).format(new Date((card.generationDate || '2026-10-19') + 'T12:00:00Z'));
+    showInfo(`<div class="eyebrow">${t('generationEyebrow')}</div><h2>${escape(card.title)}</h2><p>${t('generationCopy')}</p><p><strong>${t('created')}</strong> ${escape(created)}</p><p><strong>${t('prompt')}</strong></p><p>${escape(card.prompt)}</p>`);
   }
   function sourceMarkup(card) {
     return card.generated ? `<button class="text-button" data-source-id="${escape(card.id)}">${t('generation')}</button>` : `<a href="${escape(card.source)}" target="_blank" rel="noopener">${t('source')}</a>`;

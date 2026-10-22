@@ -1,3 +1,21 @@
 Generated image provenance
 
-All 103 AI images were generated specifically for Real or Render using OpenAI’s built-in image-generation tool. The 100 replacement cards use ordinary snapshot prompts. Each generation record contains the actual prompt; original PNGs and source hashes are retained in the project. Camera photographs retain their individual Wikimedia Commons authors and source licenses. All image previews use a common display crop. New generated images were resized and JPEG-recompressed for loading; no generative edits were applied to camera-origin images.
+All 353 AI images were generated specifically for Real or Render using OpenAI's built-in image-generation tool. The original 103 AI cards are retained, and 250 new ordinary-snapshot images were generated on 22 October 2026. Every generated card has an actual generation prompt and source hash; original PNGs are retained in the project.
+
+353 camera-origin photographs retain their individual authors, source file pages and licenses. Each camera card links to its attribution and license record. The 250 new camera images were conventionally cropped to 4:3, resized to 960×720 and recompressed as JPEG at quality 84, just like the new generated images. The interface crops previews to a shared frame; inspection shows the full image. No generative edits were applied to camera photographs.
+
+Expansion source notes
+
+REAL OR RENDER · 500-CARD EXPANSION · CAMERA-PHOTOGRAPH COLLECTION
+
+This collection adds exactly250 distinct camera photographs,50 each Nature,Places,Food,Interiors,Objects. Existing206cards and assets were read for duplicate checks only; this collector did not modify dist or outputs.
+
+Wikimedia Commons: Each selected photograph has a source File page, original media-file URL, media-file revision timestamp, original SHA1, photographer/author, exact license and license URL. Selected file revisions predate2020. File pages and raw extmetadata are preserved in source-provenance-records.json and metadata-cache/. Per-file licenses remain applicable, including CC BY-SA for cropped/resized adaptations. Attribution is required; preserve each card's author/source/license/licenseUrl fields when distributing. No claim of a collective license replaces a photograph's own license.
+
+DOCCI: https://google.github.io/docci/ and the official https://huggingface.co/datasets/google/docci dataset card state that the images were specifically photographed by the researcher and family and that all images/annotations are licensed by Google LLC under CC BY4.0. Attribution: Google LLC · DOCCI (Onoe et al., ECCV2024). License https://creativecommons.org/licenses/by/4.0/. The official explorer JavaScript uses storage.googleapis.com/docci/thumbnails/{example_id}.jpg; these official landscape JPEGs were used without downloading the7.1GB archive. Each card records the exact example_id, original dataset image_file, direct thumbnail URL, cluster_id and explorer link. Source site, dataset card, explorer source and raw descriptions/metadata were cached under docci/.
+
+Transformation for every final photograph: cropped to4:3, resized and JPEG-recompressed; no generative edits. Every output is960×720 JPEG quality84 optimize. Source dimensions permit the crop without upscaling. EXIF orientation was honored. No image retouching, synthesis, generative fill or artificial face/text blurring was applied.
+
+Quality review: all final250 were inspected in contact sheets. Rejected scans, illustrations/art subjects, obvious CGI, screenshots, major readable watermarks, explicit content, focal portraits, unsuitable crops and repeated near-identical views. Captions were not trusted as sole category evidence; primary-subject categories were manually corrected after visual review. Incidental room decorations or distant people in genuine public-place photographs may appear.
+
+Duplicate checks: final and original206 SHA256 bytes, Commons page IDs and source URLs; average/difference perceptual hashes against the original206 and every accepted new photograph, rejecting combined Hamming distances<=6. Visual review additionally rejected semantic duplicates. DOCCI broad clusters are capped at2 globally. Some natural subject types repeat with visibly different scenes and compositions.
