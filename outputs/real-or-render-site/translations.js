@@ -102,12 +102,12 @@
     document.documentElement.lang = language === 'uz' ? 'uz-Latn' : language;
     document.title = t('pageTitle');
     const description = document.querySelector('meta[name="description"]');
-    if (description) description.content = t('pageDescription', {count:window.PHOTO_CARDS?.length || 706});
+    if (description) description.content = t('pageDescription', {count:window.PHOTO_CARDS?.length || 956});
     document.dispatchEvent(new CustomEvent('ror-language-change', {detail:{language}}));
     for (const [selector,key,kind] of bindings) {
       const element = document.querySelector(selector);
       if (!element) continue;
-      const value = t(key, {count:window.PHOTO_CARDS?.length || 706});
+      const value = t(key, {count:window.PHOTO_CARDS?.length || 956});
       if (kind === 'aria-label' || kind === 'title') element.setAttribute(kind, value);
       else if (kind === 'html') element.innerHTML = value;
       else if (kind === 'direct' || kind === 'lastText') {

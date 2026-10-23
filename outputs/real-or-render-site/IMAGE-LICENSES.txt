@@ -1,3 +1,28 @@
+Current collection: 956 images, including 478 generated images and 478 camera-origin photographs.
+
+250-card expansion, 23 October 2026
+
+125 new AI images were created specifically for this game using OpenAI built-in image generation. Each card includes its actual prompt, generation date and asset hash. Original generated PNGs are retained in the project.
+
+125 new camera photographs retain individual source pages, authors and licenses. Both new classes use the same 960x720 JPEG format and quality 84 compression. Only conventional crop, resize and JPEG compression were applied to camera photos. No generative edits were used.
+
+REAL OR RENDER · ADDITIONAL250-CARD EXPANSION ·125 CAMERA PHOTOGRAPHS
+
+Adds125 new distinct camera photographs:25 each Nature,Places,Food,Interiors,Objects. Existing706 production cards in outputs/real-or-render-site were used read-only for source/hash/perceptual checks. The previous250-camera-photo collection was a baseline, not a source of reused cards. No production, dist, outputs or Git mutations were made by this collector.
+
+89 images are from the official Google DOCCI photographed corpus. https://google.github.io/docci/ and https://huggingface.co/datasets/google/docci document that images were specifically photographed by one author and family. Images and annotations are licensed by Google LLC under CC BY4.0: https://creativecommons.org/licenses/by/4.0/ . Attribution: Google LLC · DOCCI (Onoe et al., ECCV2024). Each card preserves example_id, original dataset image_file, direct official thumbnail URL, cluster_id and per-image explorer link. Official source descriptions, explorer JavaScript and dataset card were reused from the verified expansion500/real/docci cache. New selections were not already-used cards. A broad DOCCI cluster cap4 was enforced globally across existing706 plus the new collection; repeated neighboring frames were visually rejected even where the cap permitted more.
+
+36 images are from Wikimedia Commons. Each has the photographer/author, source File page, source license and exact license link, original media-file URL, media-file revision timestamp, original SHA1, original date evidence and downloaded source SHA256. All selected source revisions predate2020. Raw API extmetadata and attribution snapshots are preserved in source-provenance-records.json and metadata-cache/. Each individual license remains applicable, including CC BY-SA on cropped/resized adaptations. Preserve author/source/license/licenseUrl attribution fields in distribution. No collective license replaces an individual photograph's license.
+
+Every final image was conventionally cropped to4:3, resized and JPEG-recompressed; no generative edits. Output960×720 JPEG quality84 optimize, with EXIF orientation honored and no upscaling. No generative fill, retouching, synthesis or artificial face/text blurring was applied. Official source dimensions allow the crop at full output size.
+
+All125 final photographs were visually reviewed. Primary-subject categories were corrected manually instead of trusting caption keyword matches. Rejected scans, primary flat artwork, ambiguous CGI/designer renders, screenshots, focal portraits, substantial overlays, unsuitable crops and repeated neighboring room/meal/object frames. Physical objects can have ordinary surface decoration or small labels; incidental background people/decorations may occur in wider public-place images.
+
+Validation checks125 unique IDs,25/category,125 decoded960×720 images, complete attribution/license/source records, no upscaling, SHA256 checks against all706 retained images and new125, raw source asset hashes, Commons page IDs, DOCCI example IDs, source URLs and average+difference perceptual hashes. Combined perceptual Hamming distances<=6 were rejected. Visual review also assessed semantic similarity/composition. Baseline706 file bytes were never modified here.
+
+
+Preserved attribution for the preceding 706-card collection
+
 Generated image provenance
 
 All 353 AI images were generated specifically for Real or Render using OpenAI's built-in image-generation tool. The original 103 AI cards are retained, and 250 new ordinary-snapshot images were generated on 22 October 2026. Every generated card has an actual generation prompt and source hash; original PNGs are retained in the project.
