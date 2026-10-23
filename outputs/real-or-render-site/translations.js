@@ -1,6 +1,17 @@
 (() => {
   const strings = {
     en: {
+      startGame: "Start a game →",
+      chooseMode: "Choose your mode",
+      sixImagesBadge: "six images. trust your gut.",
+      realQuestion: "real?",
+      renderQuestion: "render?",
+      inspectionCaption: "zoom · drag · inspect",
+      testEyes: "Test your eyes →",
+      stampReal: "REAL!",
+      stampAI: "RENDER!",
+      modeHeading: "Play your way.",
+      howHeading: "A good eye goes a long way.",
       skip: 'Skip to the game', edition: 'Everyday edition', how: 'How to play',
       introEyebrow: 'A LITTLE TEST OF PERCEPTION', titleFirst: 'Trust your', titleLast: 'eyes.', introCopy: 'A moment captured.<br>Or a moment that never happened.<br>Can you see the difference?', collection: '{count} images. Six per game.', playWay: 'PLAY YOUR WAY', gameMode: 'Game mode', chill: 'Chill', noRush: 'No rush', timed: 'Timed', perImage: '20s per image', modeSwitch: 'Switching modes starts a fresh game.',
       guideTitle: 'A GOOD EYE GOES A LONG WAY', guideLook: 'Look closer', guideLookText: 'Tap the image. Zoom into the details.', guideCall: 'Make your call', guideCallText: 'Camera photograph or AI creation?', guideTruth: 'Meet the truth', guideTruthText: 'Reveal the answer and its source.', real: 'Real', ai: 'AI', shortcuts: 'Keyboard shortcuts',
@@ -19,6 +30,17 @@
       scope100: '{percent} percent', countImages: '{count} images. Six per game.', modeNoteChill: 'Your pace. Your powers of observation.', modeNoteTimed: '20 seconds each. Press Start when you’re ready.', deckChill: 'CHILL', deckTimed: 'TIMED', imageLabel: 'IMAGE', exhibit: 'EXHIBIT', closeLabel: 'Close dialog', correctCount: '{correct} of {total} correct', pointsShort: 'pts', shareText: 'I scored {points} eye points and spotted {score}/{total} in Real or Render ({mode} mode). Can you trust your eyes?', pageTitle: 'Real or Render — A test of perception', pageDescription: 'A little test of perception. Real photographs or AI creations? Play six images from a collection of {count} in Chill or Timed mode.', brandAria: 'Real or Render, start a new game', roundLabel: 'IMAGE {round} / {total}', exhibitLabel: 'EXHIBIT {number}', answerAnnouncement: 'Image {image}: {result}. {change} {points} eye points. {correct} correct so far.', languageLabel: 'Language'
     },
     ru: {
+      startGame: "Начать игру →",
+      chooseMode: "Выбрать режим",
+      sixImagesBadge: "шесть фото. доверься чутью.",
+      realQuestion: "реально?",
+      renderQuestion: "ИИ?",
+      inspectionCaption: "увеличивай · двигай · изучай",
+      testEyes: "Проверь свой взгляд →",
+      stampReal: "РЕАЛЬНО!",
+      stampAI: "ИИ!",
+      modeHeading: "Играй по-своему.",
+      howHeading: "Зоркий взгляд — твой козырь.",
       skip: 'Перейти к игре', edition: 'Ежедневная коллекция', how: 'Как играть',
       introEyebrow: 'НЕБОЛЬШОЙ ТЕСТ НАБЛЮДАТЕЛЬНОСТИ', titleFirst: 'Доверься', titleLast: 'своим глазам.', introCopy: 'Мгновение, запечатлённое камерой.<br>Или момент, которого не было.<br>Сможешь отличить?', collection: '{count} изображений. По шесть за игру.', playWay: 'ВЫБЕРИ РЕЖИМ', gameMode: 'Режим игры', chill: 'Спокойный', noRush: 'Без спешки', timed: 'На время', perImage: '20 с на фото', modeSwitch: 'Смена режима начнёт новую игру.',
       guideTitle: 'ВНИМАТЕЛЬНЫЙ ВЗГЛЯД МНОГОЕ ЗАМЕЧАЕТ', guideLook: 'Рассмотри', guideLookText: 'Нажми на фото, чтобы приблизить детали.', guideCall: 'Сделай выбор', guideCallText: 'Фото с камеры или изображение ИИ?', guideTruth: 'Узнай ответ', guideTruthText: 'Посмотри ответ и его источник.', real: 'Фото', ai: 'ИИ', shortcuts: 'Горячие клавиши',
@@ -37,6 +59,17 @@
       scope100: '{percent} процентов', countImages: '{count} изображений. По шесть за игру.', modeNoteChill: 'Твой темп. Твоя наблюдательность.', modeNoteTimed: '20 секунд на фото. Нажми «Начать», когда будешь готов.', deckChill: 'СПОКОЙНЫЙ РЕЖИМ', deckTimed: 'НА ВРЕМЯ', imageLabel: 'ФОТО', exhibit: 'ЭКСПОНАТ', closeLabel: 'Закрыть окно', correctCount: 'Верно: {correct} из {total}', pointsShort: 'баллов', shareText: 'Я набрал(а) {points} баллов за зоркость и угадал(а) {score} из {total} в игре Real or Render ({mode}). Доверишься своим глазам?', pageTitle: 'Real or Render — тест на внимательность', pageDescription: 'Тест на наблюдательность: фотографии с камеры или изображения ИИ? Угадай шесть изображений из коллекции в спокойном режиме или на время.', brandAria: 'Real or Render, начать новую игру', roundLabel: 'ФОТО {round} / {total}', exhibitLabel: 'ЭКСПОНАТ {number}', answerAnnouncement: 'Фото {image}: {result}. {change} {points} баллов за зоркость. Верных ответов: {correct}.', languageLabel: 'Язык'
     },
     uz: {
+      startGame: "O‘yinni boshlash →",
+      chooseMode: "Rejimni tanlang",
+      sixImagesBadge: "oltita rasm. sezgingizga ishoning.",
+      realQuestion: "haqiqiymi?",
+      renderQuestion: "SI?",
+      inspectionCaption: "kattalashtiring · suring · ko‘ring",
+      testEyes: "Ziyraklikni sinang →",
+      stampReal: "HAQIQIY!",
+      stampAI: "SI!",
+      modeHeading: "O‘zingizga mos o‘ynang.",
+      howHeading: "Ziyrak nigoh ko‘p narsani ko‘radi.",
       skip: 'O‘yinga o‘tish', edition: 'Kundalik to‘plam', how: 'Qanday o‘ynaladi',
       introEyebrow: 'DIQQATNI SINASH UCHUN KICHIK TEST', titleFirst: 'Ko‘zingizga', titleLast: 'ishoning.', introCopy: 'Kamera muhrlagan bir lahza.<br>Yoki aslida bo‘lmagan lahza.<br>Farqini topa olasizmi?', collection: '{count} ta rasm. Har o‘yinda oltitadan.', playWay: 'O‘Z USLUBINGIZNI TANLANG', gameMode: 'O‘yin rejimi', chill: 'Shoshilmasdan', noRush: 'Vaqt cheklanmagan', timed: 'Vaqtli', perImage: 'Har rasmga 20 soniya', modeSwitch: 'Rejimni almashtirsangiz, yangi o‘yin boshlanadi.',
       guideTitle: 'SINCHIKLAB QARASH FOYDA BERADI', guideLook: 'Yaqinroq qarang', guideLookText: 'Rasmni bosib, tafsilotlarni kattalashtiring.', guideCall: 'Taxmin qiling', guideCallText: 'Kamera surati yoki sun’iy intellekt yaratganmi?', guideTruth: 'Javobni bilib oling', guideTruthText: 'Javob va uning manbasini ko‘ring.', real: 'Haqiqiy', ai: 'SI', shortcuts: 'Klaviatura tugmalari',
@@ -56,7 +89,7 @@
     }
   };
   const bindings = [
-    ['.skip-link','skip'],['.brand','brandAria','aria-label'],['.language-label','languageLabel'],['.edition','edition','direct'],['#how','how','direct'],['.intro .eyebrow','introEyebrow'],['.title-line','titleFirst'],['h1 em','titleLast'],['.intro p','introCopy','html'],['.collection-tag','collection','direct'],['.play-settings>.section-label','playWay'],['#mode-switch','gameMode','aria-label'],['#mode-chill .mode-name','chill','direct'],['#mode-chill small','noRush'],['#mode-timed .mode-name','timed','direct'],['#mode-timed small','perImage'],['.mode-switch-hint','modeSwitch'],['.quick-guide .section-label','guideTitle'],['.guide-step:nth-child(2) p','guideLook','direct'],['.guide-step:nth-child(2) small','guideLookText'],['.guide-step:nth-child(3) p','guideCall','direct'],['.guide-step:nth-child(3) small','guideCallText'],['.guide-step:nth-child(4) p','guideTruth','direct'],['.guide-step:nth-child(4) small','guideTruthText'],['.real-label','real'],['.ai-label','ai'],['.keyboard-hint>span:last-child','shortcuts'],['.game','photoGame','aria-label'],['.eye-score>span:last-child','eyePoints'],['.correct-score>span:last-child','right'],['.result-number>span:last-child','eyePoints'],['.timer-copy>span:last-child','secondsOne'],['#photo','inspect','aria-label'],['.inspect-hint','tapCloser','lastText'],['.timed-ready .eyebrow','timedEyebrow'],['.timed-ready h2','readyTitle'],['.timed-ready p','sixImages','html'],['.ready-footnote','clockRuns'],['#image-error h3','errorTitle'],['#image-error p','errorText'],['#retry','retry'],['.choice.real>span:nth-child(2)','real','direct'],['.choice.real small','captured'],['.choice.ai>span:nth-child(2)','ai','direct'],['.choice.ai small','generated'],['#point-award>span:last-child','awardPoints'],['#back','back','text'],['#back','backAria','aria-label'],['#result .eyebrow','verdictLabel'],['#accuracy+span','accuracy'],['#best+span','bestMode'],['#again','again'],['#share','share'],['#review','review'],['#credits','credits'],['.thought p','thought','direct'],['.thought p span','sourceReminder'],['footer>span:first-child','footer','direct'],['#design-credits','design'],['#info-dialog','photoGame','aria-label'],['#info-dialog .close','closeLabel','aria-label'],['#zoom-dialog .close','closeLabel','aria-label'],['#inspect-title','inspectTitle'],['.inspect-toolbar .section-label','detailRoom'],['#scope-toggle','scopeToggleTitle','title'],['#zoom-reset','resetZoom','title'],['#zoom-reset','fit','text'],['#zoom-out','zoomOut','aria-label'],['#zoom-in','zoomIn','aria-label'],['#scope-power','zoomLabel','aria-label'],['#inspect-stage','inspectRegion','aria-label'],['#pan-controls','panGroup','aria-label'],['#pan-up','lookHigher','aria-label'],['#pan-down','lookLower','aria-label'],['#pan-left','lookLeft','aria-label'],['#pan-right','lookRight','aria-label']
+    ['.skip-link','skip'],['.brand','brandAria','aria-label'],['.language-label','languageLabel'],['.edition','edition','direct'],['#how','how','direct'],['.intro .eyebrow','introEyebrow'],['.title-line','titleFirst'],['h1 em','titleLast'],['.intro p','introCopy','html'],['.collection-tag','collection','direct'],['.play-settings>.section-label','playWay'],['#mode-switch','gameMode','aria-label'],['#mode-chill .mode-name','chill','direct'],['#mode-chill small','noRush'],['#mode-timed .mode-name','timed','direct'],['#mode-timed small','perImage'],['.mode-switch-hint','modeSwitch'],['.quick-guide .section-label','guideTitle'],['.guide-step:nth-child(2) p','guideLook','direct'],['.guide-step:nth-child(2) small','guideLookText'],['.guide-step:nth-child(3) p','guideCall','direct'],['.guide-step:nth-child(3) small','guideCallText'],['.guide-step:nth-child(4) p','guideTruth','direct'],['.guide-step:nth-child(4) small','guideTruthText'],['.real-label','real'],['.ai-label','ai'],['.keyboard-hint>span:last-child','shortcuts'],['.game','photoGame','aria-label'],['.eye-score>span:last-child','eyePoints'],['.correct-score>span:last-child','right'],['.result-number>span:last-child','eyePoints'],['.timer-copy>span:last-child','secondsOne'],['#inspect-photo','inspect','aria-label'],['.inspect-hint','tapCloser','lastText'],['.timed-ready .eyebrow','timedEyebrow'],['.timed-ready h2','readyTitle'],['.timed-ready p','sixImages','html'],['.ready-footnote','clockRuns'],['#image-error h3','errorTitle'],['#image-error p','errorText'],['#retry','retry'],['.choice.real>span:nth-child(2)','real','direct'],['.choice.real small','captured'],['.choice.ai>span:nth-child(2)','ai','direct'],['.choice.ai small','generated'],['#point-award>span:last-child','awardPoints'],['#back','back','text'],['#back','backAria','aria-label'],['#result .eyebrow','verdictLabel'],['#accuracy+span','accuracy'],['#best+span','bestMode'],['#again','again'],['#share','share'],['#review','review'],['#credits','credits'],['.thought p','thought','direct'],['.thought p span','sourceReminder'],['.footer-inner>span:first-child','footer','direct'],['#design-credits','design'],['#info-dialog','photoGame','aria-label'],['#info-dialog .close','closeLabel','aria-label'],['#zoom-dialog .close','closeLabel','aria-label'],['#inspect-title','inspectTitle'],['.inspect-toolbar .section-label','detailRoom'],['#scope-toggle','scopeToggleTitle','title'],['#zoom-reset','resetZoom','title'],['#zoom-reset','fit','text'],['#zoom-out','zoomOut','aria-label'],['#zoom-in','zoomIn','aria-label'],['#scope-power','zoomLabel','aria-label'],['#inspect-stage','inspectRegion','aria-label'],['#pan-controls','panGroup','aria-label'],['#pan-up','lookHigher','aria-label'],['#pan-down','lookLower','aria-label'],['#pan-left','lookLeft','aria-label'],['#pan-right','lookRight','aria-label']
   ];
   const dynamicBindings = ['#status-caption','#timer-label','#question','#instruction','#nav-hint','#round-label','#image-index','#progress','#deck-caption','#session-announcement'];
   const t = (key, values = {}) => String((strings[language] || strings.en)[key] ?? strings.en[key] ?? key).replace(/\{(\w+)\}/g, (_, name) => {
@@ -93,6 +126,7 @@
       if (element?.dataset.i18nAria) element.setAttribute('aria-label', t(element.dataset.i18nAria, JSON.parse(element.dataset.i18nAriaValues || '{}')));
     }
     document.querySelectorAll('.language-select').forEach(select => { select.value = language; select.setAttribute('aria-label', language === 'ru' ? 'Язык' : language === 'uz' ? 'Til' : 'Language'); });
+    window.ROR_DESIGN?.localize();
   }
   document.querySelectorAll('.language-select').forEach(select => select.addEventListener('change', () => {
     language = strings[select.value] ? select.value : 'en';

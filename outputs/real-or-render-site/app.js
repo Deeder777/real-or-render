@@ -3,7 +3,7 @@
   const $ = id => document.getElementById(id);
   const t = (key, values) => window.ROR_I18N.t(key, values);
   const cards = window.PHOTO_CARDS || [];
-  const localize = (id, key, values = {}) => { const element = $(id); element.dataset.i18nValue = key; element.dataset.i18nValues = JSON.stringify(values); element.textContent = t(key, values); };
+  const localize = (id, key, values = {}) => { const element = $(id); element.dataset.i18nValue = key; element.dataset.i18nValues = JSON.stringify(values); element.textContent = t(key, values); if (id === 'question') window.ROR_DESIGN?.stickerize(element); };
   const ROUNDS = 6;
   let seen = new Set();
   try { seen = new Set(JSON.parse(localStorage.getItem('ror-natural-seen-206-v3') || '[]')); } catch {}
@@ -96,6 +96,7 @@
   function render() {
     if (!deck.length) { $('question').textContent = t('unavailable'); return; }
     loaded = false;
+    window.ROR_DESIGN?.card(deck[round], answers[round], round);
     $('choices').hidden = !!answers[round]; $('reveal').hidden = !answers[round];
     $('real').disabled = $('ai').disabled = true;
     localize('question', 'question'); localize('instruction', 'instruction');
@@ -123,7 +124,7 @@
     const waiting = mode === 'timed' && !timedStarted;
     $('timed-ready').hidden = !waiting;
     $('photo-frame').classList.toggle('is-ready', waiting);
-    $('photo').setAttribute('tabindex', waiting ? '-1' : '0');
+    $('inspect-photo').disabled = waiting || !loaded;
     $('photo').setAttribute('aria-hidden', String(waiting));
     $('start-timed').disabled = !loaded;
     $('start-timed').textContent = loaded ? t('startTimed') : t('preparing');
@@ -147,6 +148,7 @@
   }
   function updateTimer() {
     const left = deadline ? Math.max(0, deadline - Date.now()) : remaining;
+    window.ROR_DESIGN?.timer(left, TIME_LIMIT);
     const currentAnswered = !!answers[round];
     const timerKey = mode === 'timed' && !timedStarted ? 'readyTimer' : deadline ? 'timeRemaining' : currentAnswered ? 'answerLocked' : 'waitingImage';
     localize('timer-label', timerKey, {seconds:Math.ceil(left / 1000)});
@@ -193,7 +195,9 @@
     $('point-award').className = `point-award ${correct ? 'earned' : 'lost'}`;
     $('point-award-value').textContent = `${pointChange > 0 ? '+' : '−'}${Math.abs(pointChange)}`;
     $('truth').textContent = card.ai ? t('aiAnswer') : t('realAnswer');
-    $('explanation').textContent = card.note;
+    $('explanation').textContent = card.hint || card.note || '';
+    $('explanation').hidden = !$('explanation').textContent.trim();
+    window.ROR_DESIGN?.card(card, answers[round], round);
     $('source-link').href = card.source;
     $('source-link').textContent = card.generated ? t('generation') : t('source');
     $('source-link').onclick = event => { if (card.generated) { event.preventDefault(); generationRecord(card); } };
@@ -206,9 +210,10 @@
     best = best === null ? points : Math.max(best, points); try { localStorage.setItem(mode === 'chill' ? 'ror-natural-best-points-v1' : 'ror-timed-best-points-v1', String(best)); } catch {}
     document.querySelector('.game').hidden = true; $('result').hidden = false;
     updateResult();
-    $('result').focus({preventScroll:true}); $('result').scrollIntoView({behavior:'smooth',block:'center'});
+    $('result').focus({preventScroll:true}); $('result').scrollIntoView({behavior:'auto',block:'center'});
   }
   function updateResult() {
+    window.ROR_DESIGN?.result(score);
     $('final-score').textContent = points;
     $('point-summary').textContent = t('resultSummary', {correct:score,missed:deck.length - score});
     $('accuracy').textContent = Math.round(score / deck.length * 100) + '%'; $('best').textContent = `${best ?? 0} ${t('pointsShort')}`;
@@ -251,7 +256,7 @@
     $('zoom-dialog').showModal();
     applyZoom(); updateTimer();
   }
-  $('photo').onclick = inspect;
+  $('photo').onclick = $('inspect-photo').onclick = inspect;
   $('photo').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inspect(); } });
   $('scope-toggle').onclick = () => {
     scopeOn = !scopeOn; $('scope-toggle').setAttribute('aria-pressed', String(scopeOn));
@@ -355,7 +360,7 @@
       for (let i = 0; i < 22; i++) {
         const spark = document.createElement('i'), angle = i / 22 * Math.PI * 2, distance = 45 + Math.random() * 95;
         spark.className = 'firecracker-spark';
-        spark.style.cssText = `left:${x}px;top:${y}px;--dx:${Math.cos(angle) * distance}px;--dy:${Math.sin(angle) * distance}px;--spin:${Math.random() * 400}deg;--delay:${burst * 110}ms;background:${['#9782ed','#ffba68','#ee91ac','#83c5b3','#ffffff'][i % 5]}`;
+        spark.style.cssText = `left:${x}px;top:${y}px;--dx:${Math.cos(angle) * distance}px;--dy:${Math.sin(angle) * distance}px;--spin:${Math.random() * 400}deg;--delay:${burst * 110}ms;background:${['#FFD25A','#FF8A5B','#B79BFF','#7AD3A8','#FF9EC7'][i % 5]}`;
         spark.addEventListener('animationend', () => spark.remove()); layer.appendChild(spark);
       }
     }
